@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "ANA–SNIRH Spatial Station Finder"
+type: software
+authors:
+  - family-names: "Ramirez"
+    given-names: "Jamil"
+    orcid: "https://orcid.org/0009-0009-3386-8571"
+year: 2026
+license: MIT
+repository-code: "https://github.com/JamilRamirez/ANA-SNIRH-Spatial-Station-Finder"
+abstract: >-
+  Interactive Shiny application for spatial exploration, temporal-availability
+  assessment, station-level diagnostics, common-window screening, and direct
+  access to official ANA/SNIRH hydrometeorological reports in Peru.
+keywords:
+  - hydrology
+  - precipitation
+  - streamflow
+  - ANA
+  - SNIRH
+  - Peru
+  - Shiny
+  - data availability

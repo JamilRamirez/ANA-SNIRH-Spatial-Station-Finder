@@ -1,4 +1,4 @@
-# BUILD PUBLICA V14 — tarjetas temporales separadas: completitud / cobertura nominal / aptas finales
+# BUILD PUBLICA V15 — ANA download retry + cloud fallback
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -438,28 +438,48 @@ generar_url_reporte_ana <- function(
     )
   )
 
-  res <- POST(
+  # ANA/SNIRH puede responder lentamente desde infraestructura cloud.
+  # RETRY reintenta errores transitorios y config(connecttimeout=45)
+  # eleva explícitamente el tiempo permitido para establecer la conexión.
+  res <- httr::RETRY(
+    "POST",
     endpoint,
     body = jsonlite::toJSON(
       payload,
       auto_unbox = TRUE
     ),
     encode = "raw",
-    add_headers(
+    httr::add_headers(
       "Content-Type" =
         "application/json; charset=UTF-8",
       "Accept" =
-        "application/json"
+        "application/json",
+      "Referer" =
+        "https://snirh.ana.gob.pe/VisorPorCuenca/"
     ),
-    timeout(
-      120
+    httr::config(
+      connecttimeout = 45
     ),
-    user_agent(
-      "ANA-SNIRH Spatial Station Finder"
-    )
+    httr::timeout(
+      180
+    ),
+    httr::user_agent(
+      "Mozilla/5.0 ANA-SNIRH-Spatial-Station-Finder"
+    ),
+    times = 3,
+    pause_base = 2,
+    pause_cap = 10,
+    pause_min = 1,
+    terminate_on = c(
+      400,
+      401,
+      403,
+      404
+    ),
+    quiet = TRUE
   )
 
-  stop_for_status(
+  httr::stop_for_status(
     res
   )
 
@@ -523,6 +543,9 @@ generar_url_reporte_ana <- function(
     )
   )
 }
+
+
+url_visor_ana <- "https://snirh.ana.gob.pe/VisorPorCuenca/"
 
 
 fmt_num <- function(x, digits = 0) {
@@ -2933,6 +2956,20 @@ server <- function(input, output, session) {
           "."
         ),
         style = "color:#6c757d;"
+      ),
+
+      br(),
+
+      tags$a(
+        href = url_visor_ana,
+        target = "_blank",
+        rel = "noopener noreferrer",
+        paste0(
+          "Abrir visor ANA/SNIRH (IDConfig ",
+          x$id_config,
+          ")"
+        ),
+        style = "font-size:.82rem;"
       )
     )
   })
@@ -3022,14 +3059,17 @@ server <- function(input, output, session) {
       ) {
 
         showNotification(
-          paste(
-            "ANA no pudo generar el reporte:",
+          paste0(
+            "ANA/SNIRH no respondió a la solicitud desde el servidor de la aplicación. ",
+            "IDConfig: ",
+            x$id_config,
+            ". Puede usar el enlace «Abrir visor ANA/SNIRH». Detalle: ",
             conditionMessage(
               ans
             )
           ),
           type = "error",
-          duration = 10
+          duration = 15
         )
 
         return()

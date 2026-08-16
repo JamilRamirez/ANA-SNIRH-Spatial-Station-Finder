@@ -1,4 +1,4 @@
-# BUILD PUBLICA V15 — ANA download retry + cloud fallback
+# BUILD PUBLICA V16 — navegación oficial ANA por cuenca/capa/estación
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -17,7 +17,7 @@
 #   - mapa estrictamente filtrado por Precipitación/Caudal
 #   - OMM puramente espacial, independiente de filtros temporales
 #   - catálogo XLSX como autoridad para enlazar estaciones con series
-#   - descarga de XLSX original generada y servida directamente por ANA/SNIRH
+#   - acceso al visor oficial ANA/SNIRH con instrucciones de cuenca, capa y estación
 #   - estaciones sin serie anexadas sin contaminar los station_id temporales
 #   - evaluación temporal para un periodo común
 #   - búsqueda recursiva de todas las ventanas consecutivas de N años
@@ -27,7 +27,7 @@
 # 50 km NO se etiqueta como criterio OMM. Es solo un radio de búsqueda cuando se usa archivo espacial.
 # ============================================================================
 
-pkgs <- c("shiny", "bslib", "data.table", "DT", "sf", "leaflet", "lubridate", "ggplot2", "httr", "jsonlite")
+pkgs <- c("shiny", "bslib", "data.table", "DT", "sf", "leaflet", "lubridate", "ggplot2")
 miss <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
 if (length(miss)) {
   stop("Faltan paquetes: ", paste(miss, collapse = ", "),
@@ -43,7 +43,6 @@ library(sf)
 library(leaflet)
 library(lubridate)
 library(ggplot2)
-library(httr)
 
 # ----------------------------------------------------------------------------
 # 1. CONFIGURACIÓN
@@ -389,161 +388,6 @@ WMO_DENSITY <- data.table(
 # ----------------------------------------------------------------------------
 # 4. HELPERS
 # ----------------------------------------------------------------------------
-
-generar_url_reporte_ana <- function(
-  id_config,
-  fecha_inicio,
-  fecha_fin
-) {
-
-  id_config <- suppressWarnings(
-    as.integer(
-      id_config
-    )
-  )
-
-  fecha_inicio <- as.Date(
-    fecha_inicio
-  )
-
-  fecha_fin <- as.Date(
-    fecha_fin
-  )
-
-  if (
-    is.na(id_config) ||
-    is.na(fecha_inicio) ||
-    is.na(fecha_fin) ||
-    fecha_inicio > fecha_fin
-  ) {
-    stop(
-      "IDConfig o periodo inválido."
-    )
-  }
-
-  endpoint <- paste0(
-    "https://snirh.ana.gob.pe/VisorPorCuenca/",
-    "ServicioGeneral.asmx/GeneraReporteSeriexIDConfig"
-  )
-
-  payload <- list(
-    pIDConfig = id_config,
-    pFecDesde = format(
-      fecha_inicio,
-      "%d/%m/%Y"
-    ),
-    pFecHasta = format(
-      fecha_fin,
-      "%d/%m/%Y"
-    )
-  )
-
-  # ANA/SNIRH puede responder lentamente desde infraestructura cloud.
-  # RETRY reintenta errores transitorios y config(connecttimeout=45)
-  # eleva explícitamente el tiempo permitido para establecer la conexión.
-  res <- httr::RETRY(
-    "POST",
-    endpoint,
-    body = jsonlite::toJSON(
-      payload,
-      auto_unbox = TRUE
-    ),
-    encode = "raw",
-    httr::add_headers(
-      "Content-Type" =
-        "application/json; charset=UTF-8",
-      "Accept" =
-        "application/json",
-      "Referer" =
-        "https://snirh.ana.gob.pe/VisorPorCuenca/"
-    ),
-    httr::config(
-      connecttimeout = 45
-    ),
-    httr::timeout(
-      180
-    ),
-    httr::user_agent(
-      "Mozilla/5.0 ANA-SNIRH-Spatial-Station-Finder"
-    ),
-    times = 3,
-    pause_base = 2,
-    pause_cap = 10,
-    pause_min = 1,
-    terminate_on = c(
-      400,
-      401,
-      403,
-      404
-    ),
-    quiet = TRUE
-  )
-
-  httr::stop_for_status(
-    res
-  )
-
-  obj <- jsonlite::fromJSON(
-    content(
-      res,
-      as = "text",
-      encoding = "UTF-8"
-    )
-  )
-
-  if (
-    is.null(
-      obj$d
-    ) ||
-    length(
-      obj$d
-    ) == 0 ||
-    is.na(
-      obj$d[
-        1
-      ]
-    ) ||
-    !nzchar(
-      obj$d[
-        1
-      ]
-    )
-  ) {
-    stop(
-      "ANA no devolvió un archivo de reporte."
-    )
-  }
-
-  reporte <- basename(
-    as.character(
-      obj$d[
-        1
-      ]
-    )
-  )
-
-  if (
-    !grepl(
-      "\\.xlsx$",
-      reporte,
-      ignore.case = TRUE
-    )
-  ) {
-    stop(
-      "ANA devolvió una respuesta inesperada: ",
-      reporte
-    )
-  }
-
-  paste0(
-    "https://snirh.ana.gob.pe/Repositorio/Obs/",
-    URLencode(
-      reporte,
-      reserved = TRUE
-    )
-  )
-}
-
 
 url_visor_ana <- "https://snirh.ana.gob.pe/VisorPorCuenca/"
 
@@ -1782,16 +1626,6 @@ ui <- page_sidebar(
     hr(), uiOutput("kml_info")
   ),
 
-  tags$script(
-    HTML(
-      "
-      Shiny.addCustomMessageHandler('abrir_url_ana', function(url) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      });
-      "
-    )
-  ),
-
   navset_tab(
     id = "main_nav",
 
@@ -2070,7 +1904,7 @@ ui <- page_sidebar(
                tags$li("La completitud considera la frecuencia esperada de cada serie."),
                tags$li("Una precipitación de 12 h puede requerir dos observaciones por día."),
                tags$li("Si una estación tiene varias series, el diagnóstico individual permite inspeccionarlas por separado; en comparaciones masivas se usa la mejor del periodo sin fusionarlas."),
-               tags$li("La aplicación no redistribuye los valores observados: el botón de descarga solicita a ANA/SNIRH el XLSX oficial del IDConfig seleccionado y abre el archivo alojado por ANA.")
+               tags$li("La aplicación no redistribuye los valores observados. Para descargar datos, dirige al usuario al visor oficial ANA/SNIRH e indica la cuenca, la capa hidrométrica/pluviométrica y la estación que debe localizar.")
              ))
       ),
       br(),
@@ -2916,178 +2750,110 @@ server <- function(input, output, session) {
       series_id == sid_series
     ][1]
 
-    if (
-      !nrow(x) ||
-      is.na(
-        x$id_config
-      ) ||
-      is.na(
-        x$primera_fecha
-      ) ||
-      is.na(
-        x$ultima_fecha
-      )
-    ) {
+    if (!nrow(x)) {
       return(NULL)
     }
 
-    tagList(
-      actionButton(
-        "download_ana",
-        "Descargar XLSX original desde ANA/SNIRH",
-        icon = icon(
-          "download"
-        ),
-        class = "btn-outline-primary"
+    cuenca_txt <- if (
+      "unidad_hidrografica" %in% names(x) &&
+      !is.na(x$unidad_hidrografica) &&
+      nzchar(x$unidad_hidrografica)
+    ) {
+      as.character(x$unidad_hidrografica)
+    } else {
+      "la unidad hidrográfica indicada en la ficha"
+    }
+
+    estacion_txt <- if (
+      !is.na(x$nombre_estacion) &&
+      nzchar(x$nombre_estacion)
+    ) {
+      as.character(x$nombre_estacion)
+    } else {
+      "la estación seleccionada"
+    }
+
+    codigo_txt <- if (
+      !is.na(x$codigo_estacion) &&
+      nzchar(x$codigo_estacion)
+    ) {
+      paste0(
+        " [",
+        x$codigo_estacion,
+        "]"
+      )
+    } else {
+      ""
+    }
+
+    capa_txt <- if (
+      identical(
+        input$tipo,
+        "Caudal"
+      )
+    ) {
+      "Estaciones Hidrométricas"
+    } else {
+      "Estaciones Pluviométricas"
+    }
+
+    div(
+      class = "border rounded p-3 mt-2",
+      style = "background:#F8FAFC;border-color:#DCE3EA !important;",
+
+      tags$b(
+        "Descargar datos desde ANA/SNIRH"
+      ),
+
+      br(), br(),
+
+      tags$span(
+        "1. Abra el visor oficial de ANA/SNIRH."
       ),
 
       br(),
 
-      tags$small(
+      tags$span(
         paste0(
-          "ANA generará el archivo oficial para el periodo nominal ",
-          as.character(
-            x$primera_fecha
-          ),
-          " → ",
-          as.character(
-            x$ultima_fecha
-          ),
+          "2. Busque la cuenca: ",
+          cuenca_txt,
           "."
-        ),
-        style = "color:#6c757d;"
+        )
       ),
 
       br(),
+
+      tags$span(
+        paste0(
+          "3. Active la capa «",
+          capa_txt,
+          "»."
+        )
+      ),
+
+      br(),
+
+      tags$span(
+        paste0(
+          "4. Ubique ",
+          estacion_txt,
+          codigo_txt,
+          " y abra su ficha para consultar o descargar la serie."
+        )
+      ),
+
+      br(), br(),
 
       tags$a(
         href = url_visor_ana,
         target = "_blank",
         rel = "noopener noreferrer",
-        paste0(
-          "Abrir visor ANA/SNIRH (IDConfig ",
-          x$id_config,
-          ")"
-        ),
-        style = "font-size:.82rem;"
+        class = "btn btn-outline-primary",
+        icon("arrow-up-right-from-square"),
+        " Abrir visor oficial ANA/SNIRH"
       )
     )
   })
-
-
-  observeEvent(
-    input$download_ana,
-    {
-
-      sid_series <- diag_series_state()
-
-      if (
-        is.null(
-          sid_series
-        )
-      ) {
-
-        showNotification(
-          "Seleccione primero una serie.",
-          type = "warning"
-        )
-
-        return()
-      }
-
-      x <- SERIES[
-        series_id == sid_series
-      ][1]
-
-      if (
-        !nrow(x) ||
-        is.na(
-          x$id_config
-        ) ||
-        is.na(
-          x$primera_fecha
-        ) ||
-        is.na(
-          x$ultima_fecha
-        )
-      ) {
-
-        showNotification(
-          "La serie seleccionada no tiene información suficiente para solicitar el reporte ANA.",
-          type = "error",
-          duration = 7
-        )
-
-        return()
-      }
-
-      ans <- tryCatch(
-        {
-
-          withProgress(
-            message = "Solicitando XLSX a ANA/SNIRH...",
-            value = 0.25,
-            {
-
-              url <- generar_url_reporte_ana(
-                id_config =
-                  x$id_config,
-                fecha_inicio =
-                  x$primera_fecha,
-                fecha_fin =
-                  x$ultima_fecha
-              )
-
-              incProgress(
-                0.75
-              )
-
-              url
-            }
-          )
-        },
-        error = function(e) {
-          e
-        }
-      )
-
-      if (
-        inherits(
-          ans,
-          "error"
-        )
-      ) {
-
-        showNotification(
-          paste0(
-            "ANA/SNIRH no respondió a la solicitud desde el servidor de la aplicación. ",
-            "IDConfig: ",
-            x$id_config,
-            ". Puede usar el enlace «Abrir visor ANA/SNIRH». Detalle: ",
-            conditionMessage(
-              ans
-            )
-          ),
-          type = "error",
-          duration = 15
-        )
-
-        return()
-      }
-
-      session$sendCustomMessage(
-        "abrir_url_ana",
-        ans
-      )
-
-      showNotification(
-        "Reporte generado por ANA/SNIRH. Se abrió el XLSX oficial en una nueva pestaña.",
-        type = "message",
-        duration = 5
-      )
-    },
-    ignoreInit = TRUE
-  )
 
 
   output$diag_selected_banner <- renderUI({

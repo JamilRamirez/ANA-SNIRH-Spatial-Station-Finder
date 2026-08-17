@@ -1,4 +1,4 @@
-# BUILD PUBLICA V16 — navegación oficial ANA por cuenca/capa/estación
+# BUILD PUBLICA V16.1 — nombres exactos de capas ANA: Hidrometría / Pluviometría
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -2792,9 +2792,9 @@ server <- function(input, output, session) {
         "Caudal"
       )
     ) {
-      "Estaciones Hidrométricas"
+      "Hidrometría"
     } else {
-      "Estaciones Pluviométricas"
+      "Pluviometría"
     }
 
     div(

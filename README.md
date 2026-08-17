@@ -4,6 +4,10 @@ Interactive Shiny application for exploring the spatial and temporal availabilit
 
 The application is designed as a station-finding and data-availability audit tool. It does not redistribute the original observed precipitation or streamflow values. When users need the original observations, the application provides the relevant basin, station type, and station identity so they can locate the record in the official ANA/SNIRH basin viewer and download it from ANA.
 
+## Live application
+
+https://connect.posit.cloud/jamilramirez/content/01a00cf4-6b8b-26f2-7fe6-e455d88a9978
+
 ## Main features
 
 - National exploration of hydrometric and pluviometric stations.
@@ -34,7 +38,7 @@ data/
 
 The original observed precipitation and streamflow values are **not included in this repository**.
 
-`IDConfig` identifiers are retained internally to distinguish and audit individual ANA/SNIRH series, but they are not presented as navigable web addresses. The ANA/SNIRH viewer uses a single basin-viewer URL, so the application instead tells the user which basin, hydrometric/pluviometric layer, and station should be located in the official viewer.
+`IDConfig` identifiers are retained internally to distinguish and audit individual ANA/SNIRH series, but they are not presented as navigable web addresses. The ANA/SNIRH viewer uses a single basin-viewer URL, so the application instead tells the user which basin, Hidrometría/Pluviometría layer, and station should be located in the official viewer.
 
 ## Station inventory validation
 
@@ -99,7 +103,7 @@ For a selected station/series, the application provides the information needed t
 
 1. open the official ANA/SNIRH basin viewer;
 2. search for the corresponding hydrographic basin;
-3. activate the **Estaciones Hidrométricas** or **Estaciones Pluviométricas** layer, depending on the selected variable;
+3. activate the **Hidrometría** or **Pluviometría** layer, depending on the selected variable;
 4. locate the station by its name and, when available, its station code;
 5. open the ANA station record to consult or download the available series.
 

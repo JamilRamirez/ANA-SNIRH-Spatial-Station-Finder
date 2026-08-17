@@ -2364,7 +2364,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "d397cdadbebe8f4eb91f8ef2976d8182"
+      "checksum": "cf27102d93c5f55745f4bbab642989e6"
     },
     "CITATION.cff": {
       "checksum": "94fed6092a954a493c37758eae8964b0"
@@ -2381,11 +2381,14 @@
     "data/01_inventario_estaciones_validado.csv": {
       "checksum": "b3a520873f8142ca1cff208ae625d0c1"
     },
+    "data/02_indice_raw_xlsx.csv": {
+      "checksum": "696aee541580f05babce87c4a184ec18"
+    },
     "LICENSE": {
       "checksum": "103dec477f6c8531191d3a9cddd11d85"
     },
     "README.md": {
-      "checksum": "10fe7b85dc7791fde481714da2fe28ef"
+      "checksum": "aeb4bbfa98b81d75f1a5f654c325fb20"
     }
   },
   "users": null

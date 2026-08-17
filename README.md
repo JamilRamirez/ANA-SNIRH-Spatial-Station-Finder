@@ -2,11 +2,11 @@
 
 Interactive Shiny application for exploring the spatial and temporal availability of hydrometeorological stations published through the **Sistema Nacional de Información de Recursos Hídricos (SNIRH)** of the **Autoridad Nacional del Agua (ANA), Peru**.
 
-The application is designed as a station-finding and data-availability audit tool. It does not redistribute the original observed precipitation or streamflow values. When users need the original observations, the application provides the relevant basin, station type, and station identity so they can locate the record in the official ANA/SNIRH basin viewer and download it from ANA.
+The application is designed as a station-finding and data-availability audit tool. For series with an archived report, users can download an unmodified copy of the original ANA/SNIRH XLSX report directly from the companion public archive. The official ANA/SNIRH basin viewer remains linked for source consultation and verification.
 
 ## Live application
 
-https://connect.posit.cloud/jamilramirez/content/01a00cf4-6b8b-26f2-7fe6-e455d88a9978
+https://01a00cf4-6b8b-26f2-7fe6-e455d88a9978.share.connect.posit.cloud
 
 ## Main features
 
@@ -22,7 +22,8 @@ https://connect.posit.cloud/jamilramirez/content/01a00cf4-6b8b-26f2-7fe6-e455d88
 - Recursive search for consecutive common windows of N years.
 - Selection of the best available series per station without merging IDConfig records.
 - Exploratory WMO/OMM network-density context.
-- Guided access to the official ANA/SNIRH basin viewer using the identified basin, station layer, and station name/code.
+- Direct download of archived, unmodified original ANA/SNIRH XLSX reports when available.
+- Guided access to the official ANA/SNIRH basin viewer using the identified basin, **Hidrometría/Pluviometría** layer, and station name/code.
 
 ## Data architecture
 
@@ -33,12 +34,15 @@ data/
 ├── 01_catalogo_series.csv
 ├── 01_disponibilidad_diaria.rds
 ├── 01_inventario_estaciones_validado.csv
-└── 01_estaciones_sin_serie.csv
+├── 01_estaciones_sin_serie.csv
+└── 02_indice_raw_xlsx.csv
 ```
 
-The original observed precipitation and streamflow values are **not included in this repository**.
+The application repository itself remains lightweight. Original XLSX reports are stored separately in the companion archive:
 
-`IDConfig` identifiers are retained internally to distinguish and audit individual ANA/SNIRH series, but they are not presented as navigable web addresses. The ANA/SNIRH viewer uses a single basin-viewer URL, so the application instead tells the user which basin, Hidrometría/Pluviometría layer, and station should be located in the official viewer.
+`https://github.com/JamilRamirez/ANA-SNIRH-Official-Reports`
+
+`02_indice_raw_xlsx.csv` maps each validated `IDConfig` to the preserved relative path of its archived report. The application uses this index only to construct the direct download URL; the report contents are not transformed by the Shiny application.
 
 ## Station inventory validation
 
@@ -95,28 +99,31 @@ It provides an exploratory comparison between:
 
 It should not be interpreted as proof of hydrological, climatic, or topographic representativeness, nor as a substitute for fitness-for-purpose assessment.
 
-## Accessing original series in ANA/SNIRH
+## Accessing original ANA/SNIRH reports
 
-The application does not serve or redistribute original hydrometeorological observations.
+For validated series with an archived RAW report, the application provides a direct button:
 
-For a selected station/series, the application provides the information needed to locate the official record in the ANA/SNIRH basin viewer:
+**Download original ANA/SNIRH report (.xlsx)**
 
-1. open the official ANA/SNIRH basin viewer;
+These files are preserved copies of the original XLSX reports obtained from ANA/SNIRH and are not converted to CSV, Parquet, or another normalized public-download format.
+
+Companion RAW-report archive:
+
+`https://github.com/JamilRamirez/ANA-SNIRH-Official-Reports`
+
+The official ANA/SNIRH viewer remains available for source consultation and verification. To locate a station in the official interface:
+
+1. open the ANA/SNIRH basin viewer;
 2. search for the corresponding hydrographic basin;
-3. activate the **Hidrometría** or **Pluviometría** layer, depending on the selected variable;
+3. activate the **Hidrometría** or **Pluviometría** layer;
 4. locate the station by its name and, when available, its station code;
-5. open the ANA station record to consult or download the available series.
+5. open the ANA station record.
 
 Official viewer:
 
 `https://snirh.ana.gob.pe/VisorPorCuenca/`
 
-Therefore:
-
-- original observed values remain distributed by ANA;
-- this application acts as a discovery, screening, and audit interface;
-- ANA remains the source of the station record and any downloaded report;
-- the application does not claim that an `IDConfig` corresponds to a unique public URL in the ANA interface.
+The archived XLSX copies are provided for convenient access and preserve their original ANA/SNIRH format. ANA remains the original source of the observations and report metadata.
 
 
 ## Run locally
@@ -132,9 +139,7 @@ install.packages(c(
   "sf",
   "leaflet",
   "lubridate",
-  "ggplot2",
-  "httr",
-  "jsonlite"
+  "ggplot2"
 ))
 ```
 
@@ -158,7 +163,8 @@ ANA_SNIRH_WEB/
     ├── 01_catalogo_series.csv
     ├── 01_disponibilidad_diaria.rds
     ├── 01_inventario_estaciones_validado.csv
-    └── 01_estaciones_sin_serie.csv
+    ├── 01_estaciones_sin_serie.csv
+    └── 02_indice_raw_xlsx.csv
 ```
 
 ## Data source and attribution
@@ -169,13 +175,13 @@ SNIRH basin viewer:
 
 `https://snirh.ana.gob.pe/VisorPorCuenca/`
 
-This application performs independent processing, indexing, quality-control summaries, spatial screening, and temporal-availability diagnostics.
+This application performs independent processing, indexing, quality-control summaries, spatial screening, and temporal-availability diagnostics. A companion repository archives unmodified copies of the official XLSX reports used for direct user downloads.
 
 ## License
 
 The **software code and original project documentation** in this repository are released under the MIT License.
 
-This license does **not** assert ownership of, nor relicense, third-party information originating from ANA/SNIRH. Original ANA/SNIRH data and reports remain subject to the terms and conditions of their source.
+This license does **not** assert ownership of, nor relicense, third-party information originating from ANA/SNIRH. The archived XLSX reports are preserved as source files with attribution to ANA/SNIRH and are outside the MIT license applied to this project's software code and original documentation.
 
 ## Disclaimer
 

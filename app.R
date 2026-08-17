@@ -1,4 +1,4 @@
-# BUILD PUBLICA V16.1 — nombres exactos de capas ANA: Hidrometría / Pluviometría
+# BUILD PUBLICA V17 — descarga directa de reportes RAW archivados en GitHub
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -17,7 +17,7 @@
 #   - mapa estrictamente filtrado por Precipitación/Caudal
 #   - OMM puramente espacial, independiente de filtros temporales
 #   - catálogo XLSX como autoridad para enlazar estaciones con series
-#   - acceso al visor oficial ANA/SNIRH con instrucciones de cuenca, capa y estación
+#   - descarga de copias RAW archivadas + acceso al visor oficial ANA/SNIRH
 #   - estaciones sin serie anexadas sin contaminar los station_id temporales
 #   - evaluación temporal para un periodo común
 #   - búsqueda recursiva de todas las ventanas consecutivas de N años
@@ -56,6 +56,7 @@ F_CATALOGO <- file.path(DIR_NORM, "01_catalogo_series.csv")
 F_DIARIO <- file.path(DIR_NORM, "01_disponibilidad_diaria.rds")
 F_ESTACIONES <- file.path(DIR_NORM, "01_inventario_estaciones_validado.csv")
 F_SIN_SERIE <- file.path(DIR_NORM, "01_estaciones_sin_serie.csv")
+F_RAW_INDEX <- file.path(DIR_NORM, "02_indice_raw_xlsx.csv")
 
 BUFFER_DEFAULT_KM <- 50
 UMBRAL_DEFAULT <- 90
@@ -85,6 +86,58 @@ SIN_SERIE <- if (file.exists(F_SIN_SERIE)) {
   )
 } else {
   data.table()
+}
+
+
+RAW_INDEX <- if (file.exists(F_RAW_INDEX)) {
+  fread(
+    F_RAW_INDEX,
+    encoding = "UTF-8",
+    na.strings = c("", "NA", "NaN")
+  )
+} else {
+  data.table()
+}
+
+if (nrow(RAW_INDEX)) {
+
+  required_raw_cols <- c(
+    "IDConfig",
+    "ruta_relativa"
+  )
+
+  missing_raw_cols <- setdiff(
+    required_raw_cols,
+    names(RAW_INDEX)
+  )
+
+  if (length(missing_raw_cols)) {
+    stop(
+      "Faltan columnas en 02_indice_raw_xlsx.csv: ",
+      paste(
+        missing_raw_cols,
+        collapse = ", "
+      )
+    )
+  }
+
+  RAW_INDEX[, IDConfig := as.character(IDConfig)]
+  RAW_INDEX[, ruta_relativa := gsub(
+    "\\\\",
+    "/",
+    as.character(ruta_relativa)
+  )]
+
+  if (anyDuplicated(RAW_INDEX$IDConfig)) {
+    stop(
+      "02_indice_raw_xlsx.csv contiene IDConfig duplicados."
+    )
+  }
+
+  setkey(
+    RAW_INDEX,
+    IDConfig
+  )
 }
 
 
@@ -390,6 +443,75 @@ WMO_DENSITY <- data.table(
 # ----------------------------------------------------------------------------
 
 url_visor_ana <- "https://snirh.ana.gob.pe/VisorPorCuenca/"
+
+url_repo_raw <- "https://github.com/JamilRamirez/ANA-SNIRH-Official-Reports"
+url_raw_base <- "https://raw.githubusercontent.com/JamilRamirez/ANA-SNIRH-Official-Reports/main"
+
+encode_path_segments <- function(path) {
+
+  if (
+    !length(path) ||
+    is.na(path) ||
+    !nzchar(path)
+  ) {
+    return(NA_character_)
+  }
+
+  path <- gsub(
+    "\\\\",
+    "/",
+    path
+  )
+
+  pieces <- strsplit(
+    path,
+    "/",
+    fixed = TRUE
+  )[[1]]
+
+  encoded <- vapply(
+    pieces,
+    utils::URLencode,
+    character(1),
+    reserved = TRUE
+  )
+
+  paste(
+    encoded,
+    collapse = "/"
+  )
+}
+
+raw_report_url <- function(id_config) {
+
+  if (
+    !nrow(RAW_INDEX) ||
+    !length(id_config) ||
+    is.na(id_config)
+  ) {
+    return(NA_character_)
+  }
+
+  id_txt <- as.character(
+    id_config
+  )
+
+  hit <- RAW_INDEX[
+    IDConfig == id_txt
+  ]
+
+  if (!nrow(hit)) {
+    return(NA_character_)
+  }
+
+  paste0(
+    url_raw_base,
+    "/",
+    encode_path_segments(
+      hit$ruta_relativa[1]
+    )
+  )
+}
 
 
 fmt_num <- function(x, digits = 0) {
@@ -2797,60 +2919,105 @@ server <- function(input, output, session) {
       "Pluviometría"
     }
 
+    raw_url <- raw_report_url(
+      x$id_config
+    )
+
+    raw_available <- (
+      length(raw_url) &&
+        !is.na(raw_url) &&
+        nzchar(raw_url)
+    )
+
     div(
       class = "border rounded p-3 mt-2",
       style = "background:#F8FAFC;border-color:#DCE3EA !important;",
 
       tags$b(
-        "Descargar datos desde ANA/SNIRH"
+        "Acceso a la serie"
       ),
 
       br(), br(),
 
-      tags$span(
-        "1. Abra el visor oficial de ANA/SNIRH."
-      ),
+      if (raw_available) {
+        tagList(
+          tags$a(
+            href = raw_url,
+            target = "_blank",
+            rel = "noopener noreferrer",
+            class = "btn btn-primary me-2 mb-2",
+            icon("file-excel"),
+            " Descargar reporte original ANA/SNIRH (.xlsx)"
+          ),
 
-      br(),
+          br(),
 
-      tags$span(
-        paste0(
-          "2. Busque la cuenca: ",
-          cuenca_txt,
-          "."
+          tags$small(
+            "Copia archivada sin modificaciones del reporte XLSX oficial obtenido de ANA/SNIRH. ",
+            "El archivo conserva el formato y metadatos originales de ANA.",
+            style = "color:#6c757d;"
+          ),
+
+          br(), br()
         )
-      ),
-
-      br(),
-
-      tags$span(
-        paste0(
-          "3. Active la capa «",
-          capa_txt,
-          "»."
+      } else {
+        tagList(
+          div(
+            class = "alert alert-warning py-2",
+            "No se encontró una copia RAW archivada para este IDConfig. ",
+            "Puede consultar la serie directamente en el visor oficial ANA/SNIRH."
+          )
         )
-      ),
-
-      br(),
-
-      tags$span(
-        paste0(
-          "4. Ubique ",
-          estacion_txt,
-          codigo_txt,
-          " y abra su ficha para consultar o descargar la serie."
-        )
-      ),
-
-      br(), br(),
+      },
 
       tags$a(
         href = url_visor_ana,
         target = "_blank",
         rel = "noopener noreferrer",
-        class = "btn btn-outline-primary",
+        class = "btn btn-outline-primary mb-2",
         icon("arrow-up-right-from-square"),
         " Abrir visor oficial ANA/SNIRH"
+      ),
+
+      br(), br(),
+
+      tags$span(
+        "Para localizar la estación en ANA:"
+      ),
+
+      tags$ol(
+        style = "margin-top:.4rem;margin-bottom:.2rem;",
+        tags$li(
+          paste0(
+            "Busque la cuenca: ",
+            cuenca_txt,
+            "."
+          )
+        ),
+        tags$li(
+          paste0(
+            "Active la capa «",
+            capa_txt,
+            "»."
+          )
+        ),
+        tags$li(
+          paste0(
+            "Ubique ",
+            estacion_txt,
+            codigo_txt,
+            " y abra su ficha."
+          )
+        )
+      ),
+
+      tags$small(
+        paste0(
+          "IDConfig de la serie: ",
+          x$id_config,
+          "."
+        ),
+        style = "color:#6c757d;"
       )
     )
   })

@@ -1,4 +1,4 @@
-# BUILD PUBLICA V17.1 — exportación completa de tablas DT (no solo página visible)
+# BUILD PUBLICA V17.2 — exporta altitud, IDConfig y series_id
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -70,6 +70,34 @@ if (!file.exists(F_ESTACIONES)) stop("No existe: ", F_ESTACIONES)
 # ----------------------------------------------------------------------------
 
 CAT <- fread(F_CATALOGO, encoding = "UTF-8", na.strings = c("", "NA", "NaN"))
+
+required_catalog_cols <- c(
+  "series_id",
+  "station_id",
+  "id_config",
+  "altitud_msnm",
+  "codigo_estacion",
+  "nombre_estacion",
+  "tipo_dato",
+  "variable",
+  "unidad",
+  "latitud",
+  "longitud",
+  "expected_obs_day"
+)
+
+missing_catalog_cols <- setdiff(
+  required_catalog_cols,
+  names(CAT)
+)
+
+if (length(missing_catalog_cols)) {
+  stop(
+    "El catálogo normalizado no contiene columnas requeridas: ",
+    paste(missing_catalog_cols, collapse = ", ")
+  )
+}
+
 DAY <- as.data.table(readRDS(F_DIARIO))
 
 INV_ST <- fread(
@@ -149,6 +177,8 @@ CAT[, `:=`(
   tipo_dato = as.character(tipo_dato),
   variable = as.character(variable),
   unidad = as.character(unidad),
+  id_config = as.character(id_config),
+  altitud_msnm = suppressWarnings(as.numeric(altitud_msnm)),
   latitud = suppressWarnings(as.numeric(latitud)),
   longitud = suppressWarnings(as.numeric(longitud)),
   expected_obs_day = suppressWarnings(as.integer(expected_obs_day))
@@ -1014,6 +1044,8 @@ empty_series_evaluation <- function() {
   data.table(
     series_id = character(),
     station_id = character(),
+    id_config = character(),
+    altitud_msnm = numeric(),
     codigo_estacion = character(),
     nombre_estacion = character(),
     tipo_dato = character(),
@@ -1065,6 +1097,8 @@ evaluate_series <- function(ids, f0, f1) {
     .(
       series_id,
       station_id,
+      id_config,
+      altitud_msnm,
       codigo_estacion,
       nombre_estacion,
       tipo_dato,
@@ -1227,6 +1261,8 @@ search_recursive_windows <- function(
       .(
         series_id,
         station_id,
+        id_config,
+        altitud_msnm,
         codigo_estacion,
         nombre_estacion,
         variable,
@@ -1293,6 +1329,8 @@ search_recursive_windows <- function(
     ser[, .(
       series_id,
       station_id,
+      id_config,
+      altitud_msnm,
       codigo_estacion,
       nombre_estacion,
       variable,
@@ -3629,6 +3667,9 @@ server <- function(input, output, session) {
       `Distancia al archivo espacial (km)` = ifelse(is.na(distancia_km), NA_real_, round(distancia_km, 2)),
       Estacion = nombre_estacion,
       Codigo = codigo_estacion,
+      `Altitud (msnm)` = round(altitud_msnm, 1),
+      IDConfig = id_config,
+      `Series ID normalizado` = series_id,
       `Serie disponible` = tiene_serie,
       `Variable seleccionada` = variable,
       Unidad = unidad,
@@ -3937,6 +3978,9 @@ server <- function(input, output, session) {
       Apta = apta,
       Estacion = nombre_estacion,
       Codigo = codigo_estacion,
+      `Altitud (msnm)` = round(altitud_msnm, 1),
+      IDConfig = id_config,
+      `Series ID normalizado` = series_id,
       `Variable/serie elegida` = variable,
       Unidad = unidad,
       `Primera fecha serie` = as.Date(primera_fecha),

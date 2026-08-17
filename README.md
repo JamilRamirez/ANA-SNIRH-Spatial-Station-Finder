@@ -2,7 +2,7 @@
 
 Interactive Shiny application for exploring the spatial and temporal availability of hydrometeorological stations published through the **Sistema Nacional de Información de Recursos Hídricos (SNIRH)** of the **Autoridad Nacional del Agua (ANA), Peru**.
 
-The application is designed as a station-finding and data-availability audit tool. It does not redistribute the original observed precipitation or streamflow values. When a downloadable series is available, the application requests the corresponding official XLSX report from ANA/SNIRH and opens the file hosted by ANA.
+The application is designed as a station-finding and data-availability audit tool. It does not redistribute the original observed precipitation or streamflow values. When users need the original observations, the application provides the relevant basin, station type, and station identity so they can locate the record in the official ANA/SNIRH basin viewer and download it from ANA.
 
 ## Main features
 
@@ -18,7 +18,7 @@ The application is designed as a station-finding and data-availability audit too
 - Recursive search for consecutive common windows of N years.
 - Selection of the best available series per station without merging IDConfig records.
 - Exploratory WMO/OMM network-density context.
-- Direct request of official XLSX reports from ANA/SNIRH.
+- Guided access to the official ANA/SNIRH basin viewer using the identified basin, station layer, and station name/code.
 
 ## Data architecture
 
@@ -34,7 +34,7 @@ data/
 
 The original observed precipitation and streamflow values are **not included in this repository**.
 
-The application uses ANA/SNIRH `IDConfig` identifiers to request official reports directly from the ANA service when the user chooses to download a series.
+`IDConfig` identifiers are retained internally to distinguish and audit individual ANA/SNIRH series, but they are not presented as navigable web addresses. The ANA/SNIRH viewer uses a single basin-viewer URL, so the application instead tells the user which basin, hydrometric/pluviometric layer, and station should be located in the official viewer.
 
 ## Station inventory validation
 
@@ -91,17 +91,29 @@ It provides an exploratory comparison between:
 
 It should not be interpreted as proof of hydrological, climatic, or topographic representativeness, nor as a substitute for fitness-for-purpose assessment.
 
-## Official series downloads
+## Accessing original series in ANA/SNIRH
 
-The application does not serve original hydrometeorological observations.
+The application does not serve or redistribute original hydrometeorological observations.
 
-For a selected `IDConfig`, it sends a request to the ANA/SNIRH reporting service. ANA generates the XLSX and the user's browser opens the report hosted under the ANA/SNIRH repository.
+For a selected station/series, the application provides the information needed to locate the official record in the ANA/SNIRH basin viewer:
+
+1. open the official ANA/SNIRH basin viewer;
+2. search for the corresponding hydrographic basin;
+3. activate the **Estaciones Hidrométricas** or **Estaciones Pluviométricas** layer, depending on the selected variable;
+4. locate the station by its name and, when available, its station code;
+5. open the ANA station record to consult or download the available series.
+
+Official viewer:
+
+`https://snirh.ana.gob.pe/VisorPorCuenca/`
 
 Therefore:
 
-- original values remain distributed by ANA;
-- the application acts as a discovery and audit interface;
-- ANA remains the source of the downloaded report.
+- original observed values remain distributed by ANA;
+- this application acts as a discovery, screening, and audit interface;
+- ANA remains the source of the station record and any downloaded report;
+- the application does not claim that an `IDConfig` corresponds to a unique public URL in the ANA interface.
+
 
 ## Run locally
 
@@ -165,4 +177,4 @@ This license does **not** assert ownership of, nor relicense, third-party inform
 
 This is an independent research/software project and is not an official application of the Autoridad Nacional del Agua.
 
-The application is intended to facilitate data discovery and exploratory assessment. Users remain responsible for verifying the suitability, quality, provenance, and current status of the information used in any analysis.
+The application is intended to facilitate station discovery, temporal-availability screening, and exploratory assessment. Users remain responsible for verifying the suitability, quality, provenance, current status, and official ANA/SNIRH record of any information used in an analysis.

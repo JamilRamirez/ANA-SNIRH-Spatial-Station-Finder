@@ -2370,10 +2370,10 @@
       "checksum": "94fed6092a954a493c37758eae8964b0"
     },
     "data/01_catalogo_series.csv": {
-      "checksum": "6a9ae154b0eff4992151813c5efcc619"
+      "checksum": "f6ac0fda035c2069f9ae467dd7d18620"
     },
     "data/01_disponibilidad_diaria.rds": {
-      "checksum": "b0adb12e543faf6e6f4829dc51e8c14f"
+      "checksum": "090f5f9cea14797f3686e7c14c1e06f7"
     },
     "data/01_estaciones_sin_serie.csv": {
       "checksum": "59ddfe7bc2a00b89df7df0b7e013e061"

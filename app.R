@@ -1,4 +1,4 @@
-# BUILD PUBLICA V17 — descarga directa de reportes RAW archivados en GitHub
+# BUILD PUBLICA V17.1 — exportación completa de tablas DT (no solo página visible)
 # ============================================================================
 # ANA–SNIRH Spatial Station Finder — versión pública
 #
@@ -534,14 +534,42 @@ metric_card <- function(title, value, subtitle = NULL) {
 }
 
 dt_opts <- function(n = 25) {
+
+  export_all <- list(
+    modifier = list(
+      page = "all",
+      search = "applied"
+    )
+  )
+
   list(
-    dom = "Bfrtip", buttons = c("copy", "csv", "excel"), pageLength = n,
-    scrollX = TRUE, autoWidth = TRUE,
+    dom = "Bfrtip",
+    buttons = list(
+      list(
+        extend = "copy",
+        exportOptions = export_all
+      ),
+      list(
+        extend = "csv",
+        exportOptions = export_all
+      ),
+      list(
+        extend = "excel",
+        exportOptions = export_all
+      )
+    ),
+    pageLength = n,
+    scrollX = TRUE,
+    autoWidth = TRUE,
     language = list(
-      search = "Buscar:", lengthMenu = "Mostrar _MENU_ registros",
+      search = "Buscar:",
+      lengthMenu = "Mostrar _MENU_ registros",
       info = "Mostrando _START_ a _END_ de _TOTAL_",
       zeroRecords = "Sin resultados",
-      paginate = list(previous = "Anterior", `next` = "Siguiente")
+      paginate = list(
+        previous = "Anterior",
+        `next` = "Siguiente"
+      )
     )
   )
 }
@@ -3271,7 +3299,7 @@ server <- function(input, output, session) {
       rownames = FALSE,
       class = "stripe hover compact"
     )
-  })
+  }, server = FALSE)
 
 
   output$diag_continuity <- renderUI({
@@ -3407,7 +3435,7 @@ server <- function(input, output, session) {
       rownames = FALSE,
       class = "stripe hover compact"
     )
-  })
+  }, server = FALSE)
 
 
   output$temporal_msg <- renderUI({
@@ -3589,6 +3617,8 @@ server <- function(input, output, session) {
     )
   })
 
+  # DT se ejecuta en modo cliente para que Copy/CSV/Excel exporten
+  # todas las filas filtradas y no únicamente la página visible.
   output$candidate_table <- renderDT({
     x <- copy(candidates())
     if (!nrow(x)) return(datatable(data.frame(Mensaje = "Sin estaciones candidatas."), rownames = FALSE))
@@ -3617,7 +3647,7 @@ server <- function(input, output, session) {
 
     datatable(tab, filter = "top", extensions = "Buttons", options = dt_opts(30),
               rownames = FALSE, class = "stripe hover compact")
-  })
+  }, server = FALSE)
 
   output$comp_plot <- renderPlot({
 
@@ -3836,7 +3866,7 @@ server <- function(input, output, session) {
       rownames = FALSE,
       class = "stripe hover compact"
     )
-  })
+  }, server = FALSE)
 
   rw_active_rank <- reactive({
     r <- rw_result()
@@ -3931,7 +3961,7 @@ server <- function(input, output, session) {
       rownames = FALSE,
       class = "stripe hover compact"
     )
-  })
+  }, server = FALSE)
 
   wmo <- reactive({
 

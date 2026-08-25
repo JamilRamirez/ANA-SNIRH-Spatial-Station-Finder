@@ -7,6 +7,54 @@
 # después de cargar los paquetes.
 # ============================================================================
 
+cache_source_signature <- function(paths) {
+
+  signature_one <- function(path) {
+
+    if (!file.exists(path)) {
+      return(list(size = NA_real_, md5 = NA_character_))
+    }
+
+    if (!grepl("\\.csv$", path, ignore.case = TRUE)) {
+      return(list(
+        size = as.numeric(file.info(path)$size),
+        md5 = unname(tools::md5sum(path))
+      ))
+    }
+
+    bytes <- readBin(
+      path,
+      what = "raw",
+      n = file.info(path)$size
+    )
+
+    if (length(bytes) > 1L) {
+      is_crlf <- bytes == as.raw(13L) &
+        c(bytes[-1L] == as.raw(10L), FALSE)
+      bytes <- bytes[!is_crlf]
+    }
+
+    canonical_file <- tempfile(fileext = ".csv")
+    on.exit(unlink(canonical_file), add = TRUE)
+    writeBin(bytes, canonical_file)
+
+    list(
+      size = as.numeric(length(bytes)),
+      md5 = unname(tools::md5sum(canonical_file))
+    )
+  }
+
+  signatures <- lapply(paths, signature_one)
+
+  data.frame(
+    file = basename(paths),
+    exists = file.exists(paths),
+    size = vapply(signatures, `[[`, numeric(1), "size"),
+    md5 = vapply(signatures, `[[`, character(1), "md5"),
+    stringsAsFactors = FALSE
+  )
+}
+
 init_core_data <- function(target_env = parent.frame()) {
 
   # --------------------------------------------------------------------------
@@ -66,55 +114,6 @@ init_core_data <- function(target_env = parent.frame()) {
     )
   )
 
-  .source_signature <- function(
-    paths
-  ) {
-
-    exists <- file.exists(
-      paths
-    )
-
-    info <- file.info(
-      paths
-    )
-
-    md5 <- rep(
-      NA_character_,
-      length(
-        paths
-      )
-    )
-
-    if (any(exists)) {
-      md5[
-        exists
-      ] <- unname(
-        tools::md5sum(
-          paths[
-            exists
-          ]
-        )
-      )
-    }
-
-    data.frame(
-      file = basename(
-        paths
-      ),
-      exists = exists,
-      size = ifelse(
-        exists,
-        as.numeric(
-          info$size
-        ),
-        NA_real_
-      ),
-      md5 = md5,
-      stringsAsFactors = FALSE
-    )
-  }
-
-
   if (
     !.ignore_cache &&
     file.exists(.cache_manifest_file)
@@ -127,7 +126,7 @@ init_core_data <- function(target_env = parent.frame()) {
       }
     )
 
-    .current_signature <- .source_signature(
+    .current_signature <- cache_source_signature(
       .source_files
     )
 

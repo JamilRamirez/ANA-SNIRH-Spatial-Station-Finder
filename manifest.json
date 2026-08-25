@@ -2816,8 +2816,14 @@
     }
   },
   "files": {
+    ".Rprofile": {
+      "checksum": "67f1c6d8d8a6e5ab00d46d242ad77eed"
+    },
+    "actualizar_github_3_repos.bat": {
+      "checksum": "7d12d256d70dc971453add48f05bc7c4"
+    },
     "app.R": {
-      "checksum": "2c57d456292c2463fbb5d706e4dfc32e"
+      "checksum": "13c7105b2b9c8abf329ef1e2fe1136bb"
     },
     "CHANGELOG.md": {
       "checksum": "a5f0c0c1c9394062fc90b3904242467d"
@@ -2825,35 +2831,56 @@
     "CITATION.cff": {
       "checksum": "0078fba5a42b9f7cff6aee1c90721c8b"
     },
-    "data/00_startup_cache_v3.rds": {
-      "checksum": "e2a9dd356e60a1610ce0bcfa451a0a99"
+    "data/00_data_snapshot.csv": {
+      "checksum": "6c7b02c8665a5be854c20f4bc1d62391"
     },
     "data/01_catalogo_series.csv": {
-      "checksum": "f6ac0fda035c2069f9ae467dd7d18620"
+      "checksum": "77c9bb6c51fa919750a68552851e72bb"
     },
     "data/01_disponibilidad_diaria.rds": {
-      "checksum": "090f5f9cea14797f3686e7c14c1e06f7"
+      "checksum": "34a6482bcb376a2477bbda8252bf5236"
     },
     "data/01_estaciones_sin_serie.csv": {
-      "checksum": "59ddfe7bc2a00b89df7df0b7e013e061"
+      "checksum": "82a6cfb5524ee9c93dfadf666fbd76a8"
     },
     "data/01_inventario_estaciones_validado.csv": {
-      "checksum": "b3a520873f8142ca1cff208ae625d0c1"
+      "checksum": "e7fc9c55044c952caa57456b223a7630"
     },
     "data/02_indice_raw_xlsx.csv": {
-      "checksum": "696aee541580f05babce87c4a184ec18"
+      "checksum": "b1a71c27f5c7023f665e634c998348d6"
     },
     "data/spatial_reference/cuencas_ana.gpkg": {
       "checksum": "0eee397f31b4e454d41e67f7827bc103"
+    },
+    "data/startup_cache_v3/day_001.rds": {
+      "checksum": "a7d069794579834038ccd336aebc3658"
+    },
+    "data/startup_cache_v3/day_002.rds": {
+      "checksum": "be1ef394606d4f95e20943e31a766f3d"
+    },
+    "data/startup_cache_v3/day_003.rds": {
+      "checksum": "41fe8bf02e7ad7ca25a705fda94d36e8"
+    },
+    "data/startup_cache_v3/day_004.rds": {
+      "checksum": "e276d90e0c7ac3e514220118a6b112b6"
+    },
+    "data/startup_cache_v3/day_005.rds": {
+      "checksum": "48d93fce5141f6eb371a6e71c8a5ad85"
+    },
+    "data/startup_cache_v3/manifest.rds": {
+      "checksum": "38c4211cf71049a0905ca3addbfd703a"
+    },
+    "data/startup_cache_v3/objects.rds": {
+      "checksum": "eed907ccbcf9e457dca1f38e01cea7e4"
     },
     "LICENSE": {
       "checksum": "103dec477f6c8531191d3a9cddd11d85"
     },
     "R/core_data.R": {
-      "checksum": "b2c2df0d542fd93c489b4b7e137555f5"
+      "checksum": "fb82d10e851119cba38e73dab606a229"
     },
     "R/core_helpers.R": {
-      "checksum": "432aec26e47b6e56ce5fc967c3e54e0a"
+      "checksum": "f388bbd74f08c3a56b42b0b3ea4346da"
     },
     "R/core_spatial_reference.R": {
       "checksum": "0f8b9ad1d1d7c6a091c1a154aa808fe3"
@@ -2880,7 +2907,7 @@
       "checksum": "6329cc8fc25d081c7e298070a4780342"
     },
     "README.md": {
-      "checksum": "665d690bf091554a7bd0f7528aed2cf8"
+      "checksum": "00a340345e74435254ce693298896218"
     }
   },
   "users": null

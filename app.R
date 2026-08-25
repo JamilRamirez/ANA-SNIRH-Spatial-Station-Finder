@@ -29,6 +29,13 @@
 # 50 km NO se etiqueta como criterio OMM. Es solo un radio de búsqueda cuando se usa archivo espacial.
 # ============================================================================
 
+if (!isTRUE(l10n_info()[["UTF-8"]])) {
+  for (locale in c("C.UTF-8", "es_PE.UTF-8", "en_US.UTF-8")) {
+    suppressWarnings(Sys.setlocale("LC_CTYPE", locale))
+    if (isTRUE(l10n_info()[["UTF-8"]])) break
+  }
+}
+
 pkgs <- c("shiny", "bslib", "data.table", "DT", "sf", "leaflet", "lubridate", "ggplot2", "readxl", "zip", "openxlsx")
 miss <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
 if (length(miss)) {

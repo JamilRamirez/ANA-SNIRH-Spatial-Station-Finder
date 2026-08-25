@@ -207,37 +207,7 @@ source_files <- c(
   file.path("data", "02_indice_raw_xlsx.csv")
 )
 
-exists_source <- file.exists(source_files)
-source_info <- file.info(source_files)
-
-source_md5 <- rep(
-  NA_character_,
-  length(source_files)
-)
-
-if (any(exists_source)) {
-  source_md5[
-    exists_source
-  ] <- unname(
-    tools::md5sum(
-      source_files[
-        exists_source
-      ]
-    )
-  )
-}
-
-source_signature <- data.frame(
-  file = basename(source_files),
-  exists = exists_source,
-  size = ifelse(
-    exists_source,
-    as.numeric(source_info$size),
-    NA_real_
-  ),
-  md5 = source_md5,
-  stringsAsFactors = FALSE
-)
+source_signature <- code_env$cache_source_signature(source_files)
 
 day_mb <- as.numeric(object.size(objects$DAY)) / 1024^2
 year_mb <- as.numeric(object.size(objects$YEAR_OBS)) / 1024^2

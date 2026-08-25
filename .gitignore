@@ -5,36 +5,43 @@
 .Rproj.user/
 *.Rproj
 
-# OS / editors
+# OS and editors
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 
-# Temporary Shiny / upload files
-.Rproj.user
+# Local deployment state
 rsconnect/
 
-# Local working products that must NOT be published
+# Temporary files and logs
+*.part
+*.tmp
+*.bak
+*.log
+
+# Local or legacy data products
 _raw_reportes_xlsx/
 series_long/
 _cache*/
 _logs/
 *_PARcial.csv
-*.part
-*.tmp
-*.bak
-
-# Local/master database folders
 ANA_SNIRH_NACIONAL*/
 ANA_SNIRH_NACIONAL_PRE_V8/
+data/00_startup_cache_v*.rds
+!data/startup_cache_v3/
+!data/startup_cache_v3/*.rds
 
-# Keep public derived data
+# Local GitHub update helper
+/actualizar_github*.bat
+
+# Geometry files used only for manual upload tests
+/*.gpkg
+
+# Public application data and deployment manifest remain versioned
 !data/
 !data/01_catalogo_series.csv
 !data/01_disponibilidad_diaria.rds
 !data/01_inventario_estaciones_validado.csv
 !data/01_estaciones_sin_serie.csv
-
-# Keep deployment manifest
 !manifest.json

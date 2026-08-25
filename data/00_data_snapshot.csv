@@ -1,0 +1,2 @@
+"run_id","snapshot_date","modo_refresh_xlsx","bootstrap_publico","fecha_inicio_solicitada","fecha_fin_solicitada","idconfig_total","idconfig_refrescados","idconfig_reutilizados","idconfig_descarga_requerida","idconfig_marcador_cambiado","idconfig_stale","idconfig_error","complete_refresh","updated_at"
+"20260824_114815","2026-08-24","INCREMENTAL",TRUE,"01/01/1900","24/08/2026",2893,882,2011,882,647,0,0,TRUE,"2026-08-24 12:14:47"

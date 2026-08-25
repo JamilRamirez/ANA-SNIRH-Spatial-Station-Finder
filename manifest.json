@@ -2853,31 +2853,76 @@
       "checksum": "0eee397f31b4e454d41e67f7827bc103"
     },
     "data/startup_cache_v3/day_001.rds": {
-      "checksum": "a7d069794579834038ccd336aebc3658"
+      "checksum": "f1cda58604facbab810d57194907393d"
     },
     "data/startup_cache_v3/day_002.rds": {
-      "checksum": "be1ef394606d4f95e20943e31a766f3d"
+      "checksum": "61fde0552e85eacef9aa82b734d77912"
     },
     "data/startup_cache_v3/day_003.rds": {
-      "checksum": "41fe8bf02e7ad7ca25a705fda94d36e8"
+      "checksum": "6be497066b1460ad79be08eade8a5d0e"
     },
     "data/startup_cache_v3/day_004.rds": {
-      "checksum": "e276d90e0c7ac3e514220118a6b112b6"
+      "checksum": "4c10e6f5ca48e5b03866b5b994a222df"
     },
     "data/startup_cache_v3/day_005.rds": {
-      "checksum": "48d93fce5141f6eb371a6e71c8a5ad85"
+      "checksum": "4d5ce9a3816c1bf7e71c63bfc8bd764a"
+    },
+    "data/startup_cache_v3/day_006.rds": {
+      "checksum": "987abb0c209b38fceef36b83f304e2aa"
+    },
+    "data/startup_cache_v3/day_007.rds": {
+      "checksum": "fd90081b7c839955a458b074bd42983e"
+    },
+    "data/startup_cache_v3/day_008.rds": {
+      "checksum": "c7054d81cd280322b8e1f130688ca7e5"
+    },
+    "data/startup_cache_v3/day_009.rds": {
+      "checksum": "ea7c23d8c194425baa5c6316e785b9e7"
+    },
+    "data/startup_cache_v3/day_010.rds": {
+      "checksum": "b58753da251aa6a993a41e4f692bb73b"
+    },
+    "data/startup_cache_v3/day_011.rds": {
+      "checksum": "c4804753e566df870c7922ecf4584fc2"
+    },
+    "data/startup_cache_v3/day_012.rds": {
+      "checksum": "01d66a4be69ef89b327f8bb197fa426f"
+    },
+    "data/startup_cache_v3/day_013.rds": {
+      "checksum": "3721d11b0f116fc7e94c31aff2c419f3"
+    },
+    "data/startup_cache_v3/day_014.rds": {
+      "checksum": "e4afa2a88e7665eb9355748c50590032"
+    },
+    "data/startup_cache_v3/day_015.rds": {
+      "checksum": "d0a8152d5099e222b8f8144c8b92d136"
+    },
+    "data/startup_cache_v3/day_016.rds": {
+      "checksum": "6deb5cc59c9ca1a67583c2f99cc60026"
+    },
+    "data/startup_cache_v3/day_017.rds": {
+      "checksum": "130076e2742a1f1019b4db394f33a4be"
+    },
+    "data/startup_cache_v3/day_018.rds": {
+      "checksum": "381f3e86456347de8bbc1265c87da577"
+    },
+    "data/startup_cache_v3/day_019.rds": {
+      "checksum": "9ca55603da6a7b6b789f665dec6183f7"
+    },
+    "data/startup_cache_v3/day_020.rds": {
+      "checksum": "37bb772f83b6b066ef2917da6e5277eb"
     },
     "data/startup_cache_v3/manifest.rds": {
-      "checksum": "38c4211cf71049a0905ca3addbfd703a"
+      "checksum": "b9139771daeb91cda1bb53e38cb951a8"
     },
     "data/startup_cache_v3/objects.rds": {
-      "checksum": "eed907ccbcf9e457dca1f38e01cea7e4"
+      "checksum": "935818a854c6c6862b16908d69423585"
     },
     "LICENSE": {
       "checksum": "103dec477f6c8531191d3a9cddd11d85"
     },
     "R/core_data.R": {
-      "checksum": "fb82d10e851119cba38e73dab606a229"
+      "checksum": "1d3a8787095b6467a0a7a4566ccf4ee1"
     },
     "R/core_helpers.R": {
       "checksum": "f388bbd74f08c3a56b42b0b3ea4346da"

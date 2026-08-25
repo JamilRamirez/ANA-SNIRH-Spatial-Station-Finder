@@ -188,6 +188,24 @@ if (length(missing_day)) {
   )
 }
 
+missing_day_series <- setdiff(
+  objects$SERIES$series_id,
+  unique(objects$DAY$series_id)
+)
+
+if (length(missing_day_series)) {
+  stop(
+    "El caché perdió ",
+    length(missing_day_series),
+    " series presentes en SERIES. Ejemplos: ",
+    paste(head(missing_day_series, 5L), collapse = ", ")
+  )
+}
+
+if (objects$DAY[n_obs_validas > expected_obs_day, .N]) {
+  stop("El DAY contiene observaciones válidas por encima de lo esperado por día.")
+}
+
 objects$DAY <- objects$DAY[
   ,
   ..required_day_cols

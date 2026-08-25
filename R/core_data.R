@@ -276,6 +276,17 @@ init_core_data <- function(target_env = parent.frame()) {
       invisible(NULL)
     }
 
+    .repair_legacy_utf8 <- function(x) {
+      x <- gsub(
+        "PrecipitaciC3n",
+        "Precipitación",
+        as.character(x),
+        fixed = TRUE
+      )
+      Encoding(x) <- "UTF-8"
+      x
+    }
+
     # 1. CONFIGURACIÓN
     # ----------------------------------------------------------------------------
 
@@ -417,13 +428,25 @@ init_core_data <- function(target_env = parent.frame()) {
     )]
 
     DAY[, `:=`(
-      series_id = as.character(series_id),
-      station_id = as.character(station_id),
-      tipo_dato = as.character(tipo_dato),
+      series_id = .repair_legacy_utf8(series_id),
+      station_id = .repair_legacy_utf8(station_id),
+      tipo_dato = .repair_legacy_utf8(tipo_dato),
       fecha = as.IDate(fecha),
       n_obs_validas = suppressWarnings(as.integer(n_obs_validas)),
       expected_obs_day = suppressWarnings(as.integer(expected_obs_day))
     )]
+
+    DAY[
+      is.na(expected_obs_day) | expected_obs_day < 1L,
+      expected_obs_day := 1L
+    ]
+    DAY[
+      ,
+      n_obs_validas := pmin(
+        pmax(fcoalesce(n_obs_validas, 0L), 0L),
+        expected_obs_day
+      )
+    ]
 
     CAT <- CAT[
       tipo_dato %chin% c("Precipitación", "Caudal") &

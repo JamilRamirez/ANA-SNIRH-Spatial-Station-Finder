@@ -100,7 +100,7 @@ mod_mapa_server <- function(id, spatial, spatial_stations, candidates,
 
     output$map <- renderLeaflet({
       leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
-        addProviderTiles(providers$CartoDB.Positron) %>%
+        addTiles() %>%
         setView(lng = -75, lat = -9.5, zoom = 5)
     })
 

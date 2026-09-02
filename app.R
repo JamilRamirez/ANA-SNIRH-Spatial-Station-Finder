@@ -111,6 +111,12 @@ ui <- page_sidebar(
   title = tags$div(
     class = "app-brand",
     style = "display:flex; align-items:center; gap:10px; font-family:'Lato', sans-serif;",
+
+    tags$img(
+      src = "logo.png",
+      alt = "Logo del Explorador de estaciones ANA–SNIRH",
+      class = "app-brand-logo"
+    ),
     
     tags$span(
       "Explorador de estaciones ANA–SNIRH",
@@ -298,6 +304,12 @@ ui <- page_sidebar(
       body { color: var(--brand-ink); }
 
       .app-brand { min-width: 0; }
+      .app-brand-logo {
+        flex: 0 0 auto;
+        height: 34px;
+        object-fit: contain;
+        width: 34px;
+      }
       .app-brand-title { white-space: nowrap; }
 
       .app-about-link {
@@ -706,6 +718,11 @@ ui <- page_sidebar(
       }
 
       @media (max-width: 767.98px) {
+        .app-brand-logo {
+          height: 28px;
+          width: 28px;
+        }
+
         .app-brand-title {
           font-size: 0.92rem;
           white-space: normal;

@@ -2753,32 +2753,14 @@ diagnosticar_serie <- function(series_id) {
     )
   )
 
-  if (is_ana_precip_12h(meta$tipo_dato, exp_day)) {
-    norm_url <- normalized_series_url(
-      meta$carpeta_cuenca,
-      meta$id_config
+  d <- DAY[
+    series_id == sid,
+    .(
+      fecha,
+      n_obs_validas,
+      expected_obs_day
     )
-
-    obs_12h <- download_normalized_rds(norm_url)
-    resumen_12h <- aggregate_ana_precip_12h(obs_12h)
-
-    d <- resumen_12h[
-      fecha >= fi & fecha <= ff,
-      .(
-        fecha,
-        n_obs_validas = N_obs_validas_diagnostico
-      )
-    ]
-  } else {
-    d <- DAY[
-      series_id == sid,
-      .(
-        fecha,
-        n_obs_validas,
-        expected_obs_day
-      )
-    ]
-  }
+  ]
 
   # Por seguridad: una fila diaria por serie.
   if (nrow(d)) {
